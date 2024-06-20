@@ -94,7 +94,7 @@ def main(file_name, model_name):
             }
 
             # Apply styles to cells based on category comparison
-            for row in range(2, len(results_df) + 2):  # Adjusting for Excel 1-indexing and header row
+            for row in range(2, len(results_df)+2):  # Adjusting for Excel 1-indexing and header row
                 human_category = worksheet.cell(row=row, column=results_df.columns.get_loc('human_category')+1).value
                 top_1_category = worksheet.cell(row=row, column=results_df.columns.get_loc('top_1_category')+1).value
 
