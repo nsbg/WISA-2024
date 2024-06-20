@@ -25,17 +25,19 @@ def create_vector_db():
     df["embedding"] = df["user_input"].apply(lambda x: model.encode(x))
 
     # Convert embeddings to a list for later use
-    embeddings = df["embedding"].tolist()
+    embeddings = np.vstack(df["embedding"].values).astype('float32')
+
+    # Convert list of embeddings to numpy array
+    faiss.normalize_L2(embeddings)
 
     # Initialize the Faiss index
     dimension = model.get_sentence_embedding_dimension()
-    index = faiss.IndexFlatL2(dimension)
+    index = faiss.IndexFlatIP(dimension)
 
-    # Convert list of embeddings to numpy array
-    embedding_matrix = np.array(embeddings).astype('float32')
+    # embedding_matrix = np.array(embeddings.tolist()).astype('float32')
 
     # Add embeddings to the index
-    index.add(embedding_matrix)
+    index.add(embeddings)
 
     # Save metadata for reference
     metadata = df[["category", "user_input", "model_output"]].to_dict(orient="records")
@@ -44,6 +46,8 @@ def create_vector_db():
 
 def find_most_similar(input_sentence, model, index, metadata, top_k=5):
     input_embedding = model.encode(input_sentence).astype('float32').reshape(1, -1)
+
+    faiss.normalize_L2(input_embedding)
 
     distances, indices = index.search(input_embedding, top_k)
 
