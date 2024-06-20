@@ -3,14 +3,14 @@ import sys
 
 from process import *
 
-def main():
-    user_input = sys.argv[1]
-    model_name = sys.argv[2]
-
-    if os.path.isfile(user_input):
-        process_file(user_input, model_name)
+def main(filename_or_text, model_name):
+    if os.path.isfile(filename_or_text):
+        process_file(filename_or_text, model_name)
     else:
-        process_text(user_input, model_name)
+        process_text(filename_or_text, model_name)
 
 if __name__ == "__main__":
-    main()
+    user_input = sys.argv[1]
+    embed_model = sys.argv[2]
+
+    main(user_input, embed_model)
