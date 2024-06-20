@@ -12,8 +12,6 @@ def classify_prompts(df):
 
     output_list = []
 
-    print(f"================= {MODEL_ID} 기반 추론 시작 =================")
-
     for inp in tqdm(df["prompt"]):
         messages = [
             {
@@ -33,8 +31,6 @@ def classify_prompts(df):
         )
 
         output_list.append(outputs[0]["generated_text"][len(prompt):])
-
-    print(f"================= {MODEL_ID} 기반 추론 종료 =================")
 
     # Append the classification results to the dataframe
     df["classification"] = output_list
