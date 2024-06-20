@@ -1,8 +1,4 @@
-import os
-import pandas as pd
-
 from tqdm import tqdm
-from datetime import datetime
 
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification, pipeline, TextClassificationPipeline
 
@@ -43,13 +39,19 @@ def classify_prompts(df):
     # Append the classification results to the dataframe
     df["classification"] = output_list
 
-    normal_prompts = df[df["classification"].str.strip().str.lower() != "abnormal"]       # Filter out the normal prompts
-    abnormal_prompts = df[df["classification"].str.strip().str.lower() == "abnormal"]     # Filter out the abnormal prompts
+    normal_prompts = df[df["classification"].str.strip().str.lower() != "abnormal"]     # Filter out the normal prompts
+    abnormal_prompts = df[df["classification"].str.strip().str.lower() == "abnormal"]   # Filter out the abnormal prompts
+
+    if len(normal_prompts) == 0:
+        normal_prompts = None
+    
+    if len(abnormal_prompts) == 0:
+        abnormal_prompts = None
 
     return normal_prompts, abnormal_prompts
 
 def classify_normal_prompts(user_input):
-    MODEL_ID = "checkpoint-24410"
+    MODEL_ID = "checkpoint"
 
     tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
     model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
