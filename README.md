@@ -1,1 +1,12 @@
 # WISA 2024
+
+## Usage
+### Single GPU
+#### 1. File input
+```
+CUDA_VISIBLE_DEVICES=YOUR_GPU_NUM python3 run.py YOUR_FILE_NAME YOUR_EMBEDDING_MODEL_ID
+```
+#### 2. Text input
+```
+CUDA_VISIBLE_DEVICES=YOUR_GPU_NUM python3 run.py "YOUR_INPUT_TEXT" YOUR_EMBEDDING_MODEL_ID
+```
