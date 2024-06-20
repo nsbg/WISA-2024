@@ -34,8 +34,6 @@ def create_vector_db():
     dimension = model.get_sentence_embedding_dimension()
     index = faiss.IndexFlatIP(dimension)
 
-    # embedding_matrix = np.array(embeddings.tolist()).astype('float32')
-
     # Add embeddings to the index
     index.add(embeddings)
 
