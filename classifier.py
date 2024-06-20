@@ -1,15 +1,19 @@
+import os
+import pandas as pd
+
 from tqdm import tqdm
+from datetime import datetime
 
-from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
-
-MODEL_ID = "google/gemma-7b-it"
-
-tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, add_special_tokens=True)
-model = AutoModelForCausalLM.from_pretrained(MODEL_ID, device_map="auto")
-
-pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=2)
+from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification, pipeline, TextClassificationPipeline
 
 def classify_prompts(df):
+    MODEL_ID = "google/gemma-7b-it"
+
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, add_special_tokens=True)
+    model = AutoModelForCausalLM.from_pretrained(MODEL_ID, device_map="auto")
+
+    pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=2)
+
     output_list = []
 
     print(f"================= {MODEL_ID} 기반 추론 시작 =================")
@@ -39,7 +43,21 @@ def classify_prompts(df):
     # Append the classification results to the dataframe
     df["classification"] = output_list
 
-    # Filter out the abnormal prompts
-    abnormal_prompts = df[df["classification"].str.strip().str.lower() == "abnormal"]
+    normal_prompts = df[df["classification"].str.strip().str.lower() != "abnormal"]       # Filter out the normal prompts
+    abnormal_prompts = df[df["classification"].str.strip().str.lower() == "abnormal"]     # Filter out the abnormal prompts
 
-    return abnormal_prompts
+    return normal_prompts, abnormal_prompts
+
+def classify_normal_prompts(user_input):
+    MODEL_ID = "checkpoint-24410"
+
+    tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
+    model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
+
+    pipe = TextClassificationPipeline(model=model, tokenizer=tokenizer)
+
+    output = pipe(user_input)
+
+    final_output = output[0]['label'].split('_')[1]
+
+    return final_output
