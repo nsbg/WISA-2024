@@ -42,7 +42,7 @@ def create_vector_db():
 
     return index, model, metadata
 
-def find_most_similar(input_sentence, model, index, metadata, top_k=5):
+def find_most_similar(input_sentence, model, index, metadata, top_k=1):
     input_embedding = model.encode(input_sentence).astype('float32').reshape(1, -1)
 
     faiss.normalize_L2(input_embedding)
