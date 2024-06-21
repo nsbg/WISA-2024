@@ -1,58 +1,39 @@
-from tqdm import tqdm
-
 from transformers import AutoTokenizer, AutoModelForCausalLM, AutoModelForSequenceClassification, pipeline, TextClassificationPipeline
 
-def classify_prompts(df):
-    MODEL_ID = "google/gemma-7b-it"
+GENERATION_MODEL_ID = "google/gemma-7b-it"
 
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, add_special_tokens=True)
-    model = AutoModelForCausalLM.from_pretrained(MODEL_ID, device_map="auto")
+gemma_model     = AutoModelForCausalLM.from_pretrained(GENERATION_MODEL_ID, device_map="auto")
+gemma_tokenizer = AutoTokenizer.from_pretrained(GENERATION_MODEL_ID, add_special_tokens=True)
 
-    pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=2)
+CLASSIFICATION_MODEL_ID = "checkpoint"
 
-    output_list = []
+deberta_model     = AutoModelForSequenceClassification.from_pretrained(CLASSIFICATION_MODEL_ID)
+deberta_tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
 
-    for inp in tqdm(df["prompt"]):
-        messages = [
-            {
-                "role": "user",
-                "content": "Please classify the given sentence as either normal or abnormal.\n\nClassification criteria:\n-abnormal: sexual, hate, violence, harassment, self-harm etc.\n-normal: general sentences\n\nResponse format:\nnormal\nor\nabnormal\n\nSentence:\n\n{}".format(inp)
-            }
-        ]
+def classify_prompts(inp):
+    pipe = pipeline("text-generation", model=gemma_model, tokenizer=gemma_tokenizer, max_new_tokens=2)
 
-        prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+    messages = [
+        {
+            "role": "user",
+            "content": "Please classify the given sentence as either normal or abnormal.\n\nClassification criteria:\n-abnormal: sexual, hate, violence, harassment, self-harm etc.\n-normal: general sentences\n\nResponse format:\nnormal\nor\nabnormal\n\nSentence:\n\n{}".format(inp)
+        }
+    ]
 
-        outputs = pipe(
-            prompt,
-            do_sample=True,
-            temperature=0.2,
-            top_k=50,
-            top_p=0.95,
-        )
+    prompt = pipe.tokenizer.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
 
-        output_list.append(outputs[0]["generated_text"][len(prompt):])
+    outputs = pipe(
+        prompt,
+        do_sample=True,
+        temperature=0.2,
+        top_k=50,
+        top_p=0.95,
+    )
 
-    # Append the classification results to the dataframe
-    df["classification"] = output_list
-
-    normal_prompts = df[df["classification"].str.strip().str.lower() != "abnormal"]     # Filter out the normal prompts
-    abnormal_prompts = df[df["classification"].str.strip().str.lower() == "abnormal"]   # Filter out the abnormal prompts
-
-    if len(normal_prompts) == 0:
-        normal_prompts = None
-    
-    if len(abnormal_prompts) == 0:
-        abnormal_prompts = None
-
-    return normal_prompts, abnormal_prompts
+    return outputs[0]["generated_text"][len(prompt):]
 
 def classify_normal_prompts(user_input):
-    MODEL_ID = "checkpoint"
-
-    tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
-    model = AutoModelForSequenceClassification.from_pretrained(MODEL_ID)
-
-    pipe = TextClassificationPipeline(model=model, tokenizer=tokenizer)
+    pipe = TextClassificationPipeline(model=deberta_model, tokenizer=deberta_tokenizer)
 
     output = pipe(user_input)
 
