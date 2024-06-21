@@ -5,7 +5,7 @@ GENERATION_MODEL_ID = "google/gemma-7b-it"
 gemma_model     = AutoModelForCausalLM.from_pretrained(GENERATION_MODEL_ID, device_map="auto")
 gemma_tokenizer = AutoTokenizer.from_pretrained(GENERATION_MODEL_ID, add_special_tokens=True)
 
-CLASSIFICATION_MODEL_ID = "checkpoint"
+CLASSIFICATION_MODEL_ID = "checkpoint-24410"
 
 deberta_model     = AutoModelForSequenceClassification.from_pretrained(CLASSIFICATION_MODEL_ID)
 deberta_tokenizer = AutoTokenizer.from_pretrained("microsoft/deberta-v3-base")
