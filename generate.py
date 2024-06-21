@@ -1,5 +1,10 @@
 from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
 
+GENERATION_MODEL_ID = "google/gemma-7b-it"
+
+gemma_model     = AutoModelForCausalLM.from_pretrained(GENERATION_MODEL_ID, device_map="auto")
+gemma_tokenizer = AutoTokenizer.from_pretrained(GENERATION_MODEL_ID, add_special_tokens=True)
+
 def remove_sentence(text):
     lines = text.strip().split('\n')
 
@@ -11,12 +16,7 @@ def remove_sentence(text):
     return cleaned_text
 
 def generate_output(user_input, category=None):
-    MODEL_ID = "google/gemma-7b-it"
-
-    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID, add_special_tokens=True)
-    model = AutoModelForCausalLM.from_pretrained(MODEL_ID, device_map="auto")
-
-    pipe = pipeline("text-generation", model=model, tokenizer=tokenizer, max_new_tokens=150)
+    pipe = pipeline("text-generation", model=gemma_model, tokenizer=gemma_tokenizer, max_new_tokens=150)
 
     if category != None:
         messages = [
