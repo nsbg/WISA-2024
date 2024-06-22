@@ -50,7 +50,7 @@ def process_file(file_name, model_name):
 
                 category_3 = vector_search[0]["top_1_category"]
 
-                if category_3 == "normal":
+                if category_3 == "0":
                     output = generate_output(prompt)
                 else:
                     vector_search = find_most_similar(prompt, model, index, metadata)
@@ -70,11 +70,11 @@ def process_file(file_name, model_name):
             else:
                 output = generate_output(prompt, category_2)
         
-        result_list.append([prompt, category_1, category_2, category_3, category_4, output])
+        result_list.append([prompt, category_1, category_2, category_3, category_4, similarity_score, output])
     
     result_df = pd.DataFrame(
         result_list,
-        columns=["user_input", "category1", "category2", "category3", "category_4", "model_output"]
+        columns=["user_input", "category1", "category2", "category3", "category_4", "similarity_score", "model_output"]
     )
 
     file_version = get_version()
@@ -105,27 +105,3 @@ def process_text(text, model_name):
         output = generate_output(text, abnormal_category[0]['top_1_category'])
         
     return output
-    # if normal_texts is None:
-    #     print("No normal prompts found.")
-    # else:
-    #     for prompt in tqdm(normal_prompts['prompt']):
-    #         normal_verification = classify_normal_prompts(prompt)
-            
-    #         if normal_verification not in ABNORMAL_LABELS:
-    #             output = generate_output(prompt)
-    #         else:
-    #             abnormal_category = find_most_similar(prompt, model, index, metadata)
-    #             output = generate_output(prompt, abnormal_category)
-
-    #     return output
-    
-    # if abnormal_prompts is None:
-    #     print("No abnormal prompts found.")
-    # else:
-    #     for prompt in tqdm(abnormal_prompts['prompt']):
-    #         results = find_most_similar(prompt, model, index, metadata)
-        
-    #         abnormal_category = results[0]["top_1_category"]
-    #         output = generate_output(prompt, abnormal_category)
-        
-    #     return output
