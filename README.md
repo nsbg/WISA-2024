@@ -1,5 +1,10 @@
-# WISA 2024
+# World Conference on Information Security Applications (WISA) 2024
 
+## Abstract
+This paper proposes an LLM guardrail framework that incorporates a Zero Trust architecture to validate and control the responses of Large Language Model (LLM) to unethical queries. The proposed framework applies guardrails to harmful inputs to avoid harmful responses and includes four verification steps through Policy Decision Point (PDP) and Policy Enforcement Point (PEP) structures. This structure aims to enhance the reliability and safety of LLM responses. We demonstrate this framework on a fixed model and verify its generality by applying it to various models. Consequently, this allows for evasive responses to a wide range of unethical prompts.
+
+## Proposed Algorithm
+![image](image\flowchart.png)
 ## Usage
 ### Single GPU
 #### 1. File input
